@@ -7,32 +7,38 @@ const tyoeDefs = gql`
         releaseDate: String
         rating: Int
     }
+
+    type Query {
+        books: [Book]
+    }
 `;
 
 
 const books = [{
     title: 'The Death of Ivan Llyich and Other Stories',
     author: 'Leo Tolstoy',
-    releaseDate: '1886',
+    releaseDate: '17-05-1886',
     rating: 5
 },
 {
     title: 'Nothing is True and Everything is Possible',
     author: 'Peter Pomerantsev',
-    releaseDate: '1886',
+    releaseDate: '01-01-2015',
     rating: 5
-},
-{
-    title: 'The Death of Ivan Llyich and Other Stories',
-    author: 'Leo Tolstoy',
-    releaseDate: '2015',
-    rating: 4
 },
 {
     title: 'The Lean Startup',
     author: 'Eric Ries',
-    releaseDate: '2018',
+    releaseDate: '01-05-2018',
     rating: 3
 }
 
 ]
+
+const resolvers = {
+    Query: {
+        books: () => {
+            return books;
+        }
+    }
+}
