@@ -28,23 +28,28 @@ const typeDefs = gql`
 
     type Query {
         books: [Book]
+        book(id: ID): Book
     }
 `;
 
 
 const books = [{
+     
+    id:1,
     title: 'The Death of Ivan Llyich and Other Stories',
     author: 'Leo Tolstoy',
     releaseDate: '17-05-1886',
     rating: 5
 },
-{
+{ 
+    id:2,
     title: 'Nothing is True and Everything is Possible',
     author: 'Peter Pomerantsev',
     releaseDate: '01-01-2015',
     rating: 5
 },
 {
+    id:3,
     title: 'The Lean Startup',
     author: 'Eric Ries',
     releaseDate: '01-05-2018',
@@ -57,6 +62,10 @@ const resolvers = {
     Query: {
         books: () => {
             return books;
+        },
+        book: (obj, { id }, context, info) => {
+            console.log(id);
+            return books.find( book => book.id == id);
         }
     }
 }
