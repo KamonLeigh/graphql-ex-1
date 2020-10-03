@@ -1,6 +1,6 @@
 const { ApolloServer, gql } = require('apollo-server');
 
-const tyoeDefs = gql`
+const typeDefs = gql`
     type Book {
         title: String
         author: String
@@ -42,3 +42,9 @@ const resolvers = {
         }
     }
 }
+
+const server = new ApolloServer({typeDefs, resolvers});
+
+server.listen().then(({ url }) => {
+    console.log(`Server started on ${url}`);
+});
