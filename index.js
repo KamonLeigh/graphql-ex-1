@@ -8,9 +8,11 @@ const typeDefs = gql`
     }
 
     type Author {
-        id: ID
+        id: ID!
         name: String
-        books: [Book]
+        books: [Book] # valid null, [] or [...some data] x not valid [ some data without book schema]
+        # books [Book]! there needs to be an array valid [] or [...some data]
+        # books [Book!]! # valid [...somedata]
     }
     
     type Book {
@@ -20,6 +22,8 @@ const typeDefs = gql`
         releaseDate: String
         rating: Int
         status: Status
+        # fake1 float
+        # fake2 boolean 
     }
 
     type Query {
