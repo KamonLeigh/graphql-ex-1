@@ -1,11 +1,25 @@
 const { ApolloServer, gql } = require('apollo-server');
 
 const typeDefs = gql`
+    enum Status {
+        READ
+        INTERESTED
+        NOT_INTERESTED
+    }
+
+    type Author {
+        id: ID
+        name: String
+        books: [Book]
+    }
+    
     type Book {
+        id: ID!
         title: String
-        author: String
+        author: Author
         releaseDate: String
         rating: Int
+        status: Status
     }
 
     type Query {
