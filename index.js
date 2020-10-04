@@ -37,8 +37,16 @@ const typeDefs = gql`
         author(id: ID): Author
     }
 
+    input BookInput {
+        title: String
+        author: ID
+        releaseDate: Date
+        rating: Int
+        status: Status
+    }
+
     type Mutation {
-        addBook(title: String, status: Status, author: ID, rating: Int, releaseDate: Date): [Book]
+        addBook(data:BookInput):Book
         addAuthor(name: String):[Author]
     }
 `;
@@ -119,16 +127,17 @@ const resolvers = {
     },
     Mutation: {
         addBook: (obj, args, context, info) => {
-            const isAuthorPresent = authors.some(author => {
-                return author.id == args.author
-            })
+            // const isAuthorPresent = authors.some(author => {
+            //     return author.id == args.author
+            // })
 
-            if (!isAuthorPresent) {
-                throw new Error('Author not found')
-            }
+            // if (!isAuthorPresent) {
+            //     throw new Error('Author not found')
+            // }
 
-            const newBook = { id: books.length + 1 ,...args}
+            const newBook = { id: books.length + 1 ,...args.data}
             books.push(newBook);
+            console.log(args)
         },
         addAuthor: (obj, args, context, info) => {
             const newAuthor = {id: authors.length + 1, ...args }
