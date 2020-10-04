@@ -1,8 +1,12 @@
 const { ApolloServer, gql } = require('apollo-server');
+const { GraphQLScalarType } = require('graphql');
+const { Kind } = require('graphql/language')
 
 const typeDefs = gql`
+    scalar Date
+
     enum Status {
-        READ
+        READ 
         INTERESTED
         NOT_INTERESTED
     }
@@ -19,7 +23,7 @@ const typeDefs = gql`
         id: ID!
         title: String
         author: Author
-        releaseDate: String
+        releaseDate: Date
         rating: Int
         status: Status
         # fake1 float
@@ -38,21 +42,21 @@ const books = [{
     id:1,
     title: 'The Death of Ivan Llyich and Other Stories',
     author: 'Leo Tolstoy',
-    releaseDate: '17-05-1886',
+    releaseDate: new Date('17-05-1886'),
     rating: 5
 },
 { 
     id:2,
     title: 'Nothing is True and Everything is Possible',
     author: 'Peter Pomerantsev',
-    releaseDate: '01-01-2015',
+    releaseDate: new Date('01-01-2015'),
     rating: 5
 },
 {
     id:3,
     title: 'The Lean Startup',
     author: 'Eric Ries',
-    releaseDate: '01-05-2018',
+    releaseDate: new Date('01-05-2018'),
     rating: 3
 }
 
@@ -67,7 +71,25 @@ const resolvers = {
             console.log(id);
             return books.find( book => book.id == id);
         }
-    }
+    },
+    Date: new GraphQLScalarType({
+        name: 'Date',
+        description: "It's a date, deal with it",
+        parseValue(value) {
+         // value from the client
+         return new Date(value);
+        },
+        serialize(value) {
+         // value sent to the client 
+         return value.getTime()
+        },
+        parseLiteral(ast) {
+            if (ast.kind === kind.INT) {
+                return new Date(ast.value);
+            }
+            return null
+        }
+    })
 }
 
 const server = new ApolloServer({typeDefs, resolvers});
