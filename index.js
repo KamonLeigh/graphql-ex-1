@@ -33,29 +33,48 @@ const typeDefs = gql`
     type Query {
         books: [Book]
         book(id: ID): Book
+        authors: [Author]
+        author(id: ID): Author
     }
 `;
 
+
+const authors = [
+{
+    id: 1,
+    name: 'Leo Tolstoy'
+},
+{
+    id: 2,
+    name: 'Peter Pomerantsev'
+},
+{
+  id: 3,
+  name: 'Eric Ries',
+
+}
+
+]
 
 const books = [{
      
     id:1,
     title: 'The Death of Ivan Llyich and Other Stories',
-    author: 'Leo Tolstoy',
+    author: 1,
     releaseDate: new Date('17-05-1886'),
     rating: 5
 },
 { 
     id:2,
     title: 'Nothing is True and Everything is Possible',
-    author: 'Peter Pomerantsev',
+    author: 2,
     releaseDate: new Date('01-01-2015'),
     rating: 5
 },
 {
     id:3,
     title: 'The Lean Startup',
-    author: 'Eric Ries',
+    author: 3,
     releaseDate: new Date('01-05-2018'),
     rating: 3
 }
@@ -68,8 +87,29 @@ const resolvers = {
             return books;
         },
         book: (obj, { id }, context, info) => {
-            console.log(id);
             return books.find( book => book.id == id);
+        },
+        authors: () => {
+            return authors;
+        },
+        author: (obj, { id }, context, info) => {
+            console.log(id)
+            return authors.find(author => author.id == id)
+        }
+    },
+    Author: {
+        books: (obj, args, context, info ) => {
+            console.log('running');
+            return books.filter(book => {
+                return book.author == obj.id
+            })
+        }
+    },
+    Book: {
+        author: (obj, args, context, info) => {
+            return authors.find(author => {
+                return author.id == obj.author
+            })
         }
     },
     Date: new GraphQLScalarType({
