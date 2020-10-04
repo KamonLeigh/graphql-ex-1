@@ -36,6 +36,11 @@ const typeDefs = gql`
         authors: [Author]
         author(id: ID): Author
     }
+
+    type Mutation {
+        addBook(title: String, status: Status, author: ID, rating: Int, releaseDate: Date): [Book]
+        addAuthor(name: String):[Author]
+    }
 `;
 
 
@@ -110,6 +115,24 @@ const resolvers = {
             return authors.find(author => {
                 return author.id == obj.author
             })
+        }
+    },
+    Mutation: {
+        addBook: (obj, args, context, info) => {
+            const isAuthorPresent = authors.some(author => {
+                return author.id == args.author
+            })
+
+            if (!isAuthorPresent) {
+                throw new Error('Author not found')
+            }
+
+            const newBook = { id: books.length + 1 ,...args}
+            books.push(newBook);
+        },
+        addAuthor: (obj, args, context, info) => {
+            const newAuthor = {id: authors.length + 1, ...args }
+            authors.push(newAuthor);
         }
     },
     Date: new GraphQLScalarType({
