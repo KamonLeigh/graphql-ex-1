@@ -126,7 +126,8 @@ const resolvers = {
         }
     },
     Mutation: {
-        addBook: (obj, args, context, info) => {
+        addBook: (obj, args, { userId }, info) => {
+            //console.log('context', context);
             // const isAuthorPresent = authors.some(author => {
             //     return author.id == args.author
             // })
@@ -134,10 +135,13 @@ const resolvers = {
             // if (!isAuthorPresent) {
             //     throw new Error('Author not found')
             // }
+            if (userId) {
+                const newBook = { id: books.length + 1 ,...args.data}
+                books.push(newBook);
+                return newBook;
+            }
 
-            const newBook = { id: books.length + 1 ,...args.data}
-            books.push(newBook);
-            return newBook;
+            throw new Error('Please log in...')
         },
         addAuthor: (obj, args, context, info) => {
             const newAuthor = {id: authors.length + 1, ...args }
@@ -169,8 +173,12 @@ const server = new ApolloServer({
     typeDefs, 
     resolvers,
     context:({ req }) => {
-        console.log(req);
-        return {}
+        const fakeUser ={
+            userId: 'hello'
+        }
+        return {
+            ...fakeUser
+        }
     }
 });
 
