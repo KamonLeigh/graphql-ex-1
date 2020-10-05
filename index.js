@@ -137,11 +137,12 @@ const resolvers = {
 
             const newBook = { id: books.length + 1 ,...args.data}
             books.push(newBook);
-            console.log(args)
+            return newBook;
         },
         addAuthor: (obj, args, context, info) => {
             const newAuthor = {id: authors.length + 1, ...args }
             authors.push(newAuthor);
+            return authors
         }
     },
     Date: new GraphQLScalarType({
@@ -164,7 +165,14 @@ const resolvers = {
     })
 }
 
-const server = new ApolloServer({typeDefs, resolvers});
+const server = new ApolloServer({
+    typeDefs, 
+    resolvers,
+    context:({ req }) => {
+        console.log(req);
+        return {}
+    }
+});
 
 server.listen().then(({ url }) => {
     console.log(`Server started on ${url}`);
