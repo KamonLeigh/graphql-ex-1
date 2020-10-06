@@ -1,7 +1,12 @@
 const { ApolloServer, gql } = require('apollo-server');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language')
+const mongoose = require('mongoose');
 
+mongoose.connect(process.env.URL, {useNewUrlParser: true,useCreateIndex: true,
+    useUnifiedTopology: true, })
+
+const db = mongoose.connection;
 
 // gql`` parses your string into AST
 const typeDefs = gql`
@@ -191,6 +196,14 @@ const server = new ApolloServer({
     }
 });
 
-server.listen().then(({ url }) => {
-    console.log(`Server started on ${url}`);
+
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  console.log('db connected');
+    server
+        .listen()
+        .then(({ url }) => {
+            console.log(`Server started on ${url}`);
+    });
 });
+
