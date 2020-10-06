@@ -2,7 +2,16 @@ const { ApolloServer, gql } = require('apollo-server');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language')
 
+
+// gql`` parses your string into AST
 const typeDefs = gql`
+
+    # Write this in your frond end of playground
+    
+    fragment Meta on Book {
+        releaseDate
+        rating
+    }
     scalar Date
 
     enum Status {
