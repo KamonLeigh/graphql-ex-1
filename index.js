@@ -8,6 +8,27 @@ mongoose.connect(process.env.URL, {useNewUrlParser: true,useCreateIndex: true,
 
 const db = mongoose.connection;
 
+const bookSchema = new mongoose.Schema({
+    title: String,
+    authorId: String,
+    releaseDate: Date,
+    rating: Number,
+    status: String
+  });
+
+
+const Book = mongoose.model('Book', bookSchema);
+
+
+const authorShema = new mongoose.Schema({
+    name: String,
+    books: [String]
+})
+
+const Author = mongoose.model('Author', authorShema);
+
+
+
 // gql`` parses your string into AST
 const typeDefs = gql`
 
@@ -110,7 +131,8 @@ const books = [{
 
 const resolvers = {
     Query: {
-        books: () => {
+        books: async () => {
+            const books = await Book.find();
             return books;
         },
         book: (obj, { id }, context, info) => {
@@ -140,18 +162,12 @@ const resolvers = {
         }
     },
     Mutation: {
-        addBook: (obj, args, { userId }, info) => {
-            //console.log('context', context);
-            // const isAuthorPresent = authors.some(author => {
-            //     return author.id == args.author
-            // })
-
-            // if (!isAuthorPresent) {
-            //     throw new Error('Author not found')
-            // }
+        addBook: async (obj, { data }, { userId }, info) => {
+            console.log(data);
             if (userId) {
-                const newBook = { id: books.length + 1 ,...args.data}
-                books.push(newBook);
+            const newBook = await  Book.create({
+                ...data
+               })
                 return newBook;
             }
 
