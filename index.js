@@ -10,7 +10,10 @@ const db = mongoose.connection;
 
 const bookSchema = new mongoose.Schema({
     title: String,
-    authorId: String,
+    author: {
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Author'
+    },
     releaseDate: Date,
     rating: Number,
     status: String
@@ -22,7 +25,10 @@ const Book = mongoose.model('Book', bookSchema);
 
 const authorShema = new mongoose.Schema({
     name: String,
-    books: [String]
+    books: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Book'
+    }]
 })
 
 const Author = mongoose.model('Author', authorShema);
@@ -82,7 +88,7 @@ const typeDefs = gql`
 
     type Mutation {
         addBook(data:BookInput):Book
-        addAuthor(name: String):[Author]
+        addAuthor(name: String):Author
     }
 `;
 
@@ -138,27 +144,28 @@ const resolvers = {
         book: (obj, { id }, context, info) => {
             return books.find( book => book.id == id);
         },
-        authors: () => {
-            return authors;
+        authors: async () => {
+             const authors = await Author.find();
+             return authors;
         },
-        author: (obj, { id }, context, info) => {
-            console.log(id)
-            return authors.find(author => author.id == id)
+        author: async (obj, { id }, context, info) => {
+            const author = await Author.findById({_id: id});
+            return author;
+           
         }
     },
     Author: {
-        books: (obj, args, context, info ) => {
+        books: async (obj, args, context, info ) => {
             console.log('running');
-            return books.filter(book => {
-                return book.author == obj.id
-            })
+            const books = await Book.find({  author: obj.id})
+            return books;
         }
     },
     Book: {
-        author: (obj, args, context, info) => {
-            return authors.find(author => {
-                return author.id == obj.author
-            })
+        author: async (obj, args, context, info) => {
+            const author = await Author.findById({_id: obj.author});
+            console.log(author);
+            return author;
         }
     },
     Mutation: {
@@ -173,10 +180,14 @@ const resolvers = {
 
             throw new Error('Please log in...')
         },
-        addAuthor: (obj, args, context, info) => {
-            const newAuthor = {id: authors.length + 1, ...args }
-            authors.push(newAuthor);
-            return authors
+        addAuthor: async (obj, args, context, info) => {
+            
+            const newAuthor = await Author.create({
+                ...args
+            })
+            console.log(newAuthor);
+
+            return newAuthor;
         }
     },
     Date: new GraphQLScalarType({
