@@ -142,7 +142,7 @@ const resolvers = {
             return books;
         },
         book: async  (obj, { id }, context, info) => {
-         const book = await books.findById({ _id: id});
+         const book = await Book.findById({ _id: id});
          return book;
         },
         authors: async () => {
