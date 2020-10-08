@@ -1,4 +1,4 @@
-const { ApolloServer, gql } = require('apollo-server');
+const { ApolloServer, gql, PubSub } = require('apollo-server');
 const { GraphQLScalarType } = require('graphql');
 const { Kind } = require('graphql/language')
 const mongoose = require('mongoose');
@@ -90,6 +90,10 @@ const typeDefs = gql`
         addBook(data:BookInput):Book
         addAuthor(name: String):Author
     }
+
+    type Subscription {
+        bookAdd: Book
+    }
 `;
 
 
@@ -135,7 +139,15 @@ const books = [{
 
 ]
 
+const pubSub = new PubSub();
+const BOOK_ADDED = 'BOOK_ADDED';
+
 const resolvers = {
+    Subscription: {
+        bookAdd: {
+            subscribe: () => pubSub.asyncIterator([BOOK_ADDED])
+        }
+    },
     Query: {
         books: async () => {
             const books = await Book.find();
@@ -173,9 +185,10 @@ const resolvers = {
         addBook: async (obj, { data }, { userId }, info) => {
             console.log(data);
             if (userId) {
-            const newBook = await  Book.create({
-                ...data
-               })
+                const newBook = await  Book.create({
+                    ...data
+                })
+                pubSub.publish(BOOK_ADDED, { bookAdd: newBook });
                 return newBook;
             }
 
