@@ -141,8 +141,9 @@ const resolvers = {
             const books = await Book.find();
             return books;
         },
-        book: (obj, { id }, context, info) => {
-            return books.find( book => book.id == id);
+        book: async  (obj, { id }, context, info) => {
+         const book = await books.findById({ _id: id});
+         return book;
         },
         authors: async () => {
              const authors = await Author.find();
